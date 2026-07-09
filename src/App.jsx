@@ -24,70 +24,82 @@ function TicTacToe() {
   };
 
 const winningCombinations = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
 ];
 
-const findWinningMove = (board, player) => {
-  for (const [a, b, c] of winningCombinations) {
-    const line = [board[a], board[b], board[c]];
-
-    if (
-      line.filter((cell) => cell === player).length === 2 &&
-      line.includes(null)
-    ) {
-      if (board[a] === null) return a;
-      if (board[b] === null) return b;
-      return c;
+const checkWinner = (board) => {
+  for (const [a,b,c] of winningCombinations) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
     }
   }
+
+  if (board.every(cell => cell !== null)) return "draw";
+
   return null;
 };
 
+const minimax = (board, depth, isMaximizing) => {
+  const result = checkWinner(board);
+
+  if (result === "O") return 10 - depth;
+  if (result === "X") return depth - 10;
+  if (result === "draw") return 0;
+
+  if (isMaximizing) {
+    let best = -Infinity;
+
+    for (let i = 0; i < 9; i++) {
+      if (board[i] === null) {
+        board[i] = "O";
+        best = Math.max(best, minimax(board, depth + 1, false));
+        board[i] = null;
+      }
+    }
+
+    return best;
+  } else {
+    let best = Infinity;
+
+    for (let i = 0; i < 9; i++) {
+      if (board[i] === null) {
+        board[i] = "X";
+        best = Math.min(best, minimax(board, depth + 1, true));
+        board[i] = null;
+      }
+    }
+
+    return best;
+  }
+};
+
 const computerMove = () => {
-  let move = null;
+  let bestScore = -Infinity;
+  let bestMove = -1;
 
-  // 1. Win if possible
-  move = findWinningMove(board, "O");
+  for (let i = 0; i < 9; i++) {
+    if (board[i] === null) {
+      board[i] = "O";
 
-  // 2. Block opponent
-  if (move === null) {
-    move = findWinningMove(board, "X");
-  }
+      const score = minimax(board, 0, false);
 
-  // 3. Take center
-  if (move === null && board[4] === null) {
-    move = 4;
-  }
+      board[i] = null;
 
-  // 4. Take a random corner
-  if (move === null) {
-    const corners = [0, 2, 6, 8].filter((i) => board[i] === null);
-    if (corners.length) {
-      move = corners[Math.floor(Math.random() * corners.length)];
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = i;
+      }
     }
   }
 
-  // 5. Take any remaining side
-  if (move === null) {
-    const sides = [1, 3, 5, 7].filter((i) => board[i] === null);
-    if (sides.length) {
-      move = sides[Math.floor(Math.random() * sides.length)];
-    }
+  if (bestMove !== -1) {
+    const newBoard = [...board];
+    newBoard[bestMove] = "O";
+    setBoard(newBoard);
+    setIsXNext(true);
   }
-
-  if (move === null) return;
-
-  const newBoard = [...board];
-  newBoard[move] = "O";
-  setBoard(newBoard);
-  setIsXNext(true);
 };
   const renderSquare = (index) => (
     <button className="square" onClick={() => handleClick(index)}>
