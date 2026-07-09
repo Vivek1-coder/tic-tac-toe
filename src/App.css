@@ -1,0 +1,62 @@
+@import "tailwindcss";
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: black;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.game {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.board {
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  grid-gap: 5px;
+ 
+}
+
+.board-row {
+  display: flex;
+}
+
+.square {
+  width: 100px;
+  height: 100px;
+  font-size: 2rem;
+  background-color: #fff;
+  border: 2px solid #000;
+  cursor: pointer;
+  color:black;
+  transition: all 0.3s;
+}
+
+.square:hover {
+  background-color: #f0f0f0;
+}
+
+.winner-message,
+.turn-message {
+  margin-top: 20px;
+  font-size: 1.5rem;
+}
+
+.restart-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.restart-button:hover {
+  background-color: #0056b3;
+}
