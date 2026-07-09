@@ -23,84 +23,89 @@ function TicTacToe() {
     setIsXNext(false);
   };
 
-const winningCombinations = [
-  [0,1,2],[3,4,5],[6,7,8],
-  [0,3,6],[1,4,7],[2,5,8],
-  [0,4,8],[2,4,6]
-];
+  const winningCombinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
 
-const checkWinner = (board) => {
-  for (const [a,b,c] of winningCombinations) {
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a];
+  const checkWinner = (board) => {
+    for (const [a, b, c] of winningCombinations) {
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a];
+      }
     }
-  }
 
-  if (board.every(cell => cell !== null)) return "draw";
+    if (board.every((cell) => cell !== null)) return "draw";
 
-  return null;
-};
+    return null;
+  };
 
-const minimax = (board, depth, isMaximizing) => {
-  const result = checkWinner(board);
+  const minimax = (board, depth, isMaximizing) => {
+    const result = checkWinner(board);
 
-  if (result === "O") return 10 - depth;
-  if (result === "X") return depth - 10;
-  if (result === "draw") return 0;
+    if (result === "O") return 10 - depth;
+    if (result === "X") return depth - 10;
+    if (result === "draw") return 0;
 
-  if (isMaximizing) {
-    let best = -Infinity;
+    if (isMaximizing) {
+      let best = -Infinity;
+
+      for (let i = 0; i < 9; i++) {
+        if (board[i] === null) {
+          board[i] = "O";
+          best = Math.max(best, minimax(board, depth + 1, false));
+          board[i] = null;
+        }
+      }
+
+      return best;
+    } else {
+      let best = Infinity;
+
+      for (let i = 0; i < 9; i++) {
+        if (board[i] === null) {
+          board[i] = "X";
+          best = Math.min(best, minimax(board, depth + 1, true));
+          board[i] = null;
+        }
+      }
+
+      return best;
+    }
+  };
+
+  const computerMove = () => {
+    let bestScore = -Infinity;
+    let bestMove = -1;
 
     for (let i = 0; i < 9; i++) {
       if (board[i] === null) {
         board[i] = "O";
-        best = Math.max(best, minimax(board, depth + 1, false));
+
+        const score = minimax(board, 0, false);
+
         board[i] = null;
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = i;
+        }
       }
     }
 
-    return best;
-  } else {
-    let best = Infinity;
-
-    for (let i = 0; i < 9; i++) {
-      if (board[i] === null) {
-        board[i] = "X";
-        best = Math.min(best, minimax(board, depth + 1, true));
-        board[i] = null;
-      }
+    if (bestMove !== -1) {
+      const newBoard = [...board];
+      newBoard[bestMove] = "O";
+      setBoard(newBoard);
+      setIsXNext(true);
     }
-
-    return best;
-  }
-};
-
-const computerMove = () => {
-  let bestScore = -Infinity;
-  let bestMove = -1;
-
-  for (let i = 0; i < 9; i++) {
-    if (board[i] === null) {
-      board[i] = "O";
-
-      const score = minimax(board, 0, false);
-
-      board[i] = null;
-
-      if (score > bestScore) {
-        bestScore = score;
-        bestMove = i;
-      }
-    }
-  }
-
-  if (bestMove !== -1) {
-    const newBoard = [...board];
-    newBoard[bestMove] = "O";
-    setBoard(newBoard);
-    setIsXNext(true);
-  }
-};
+  };
   const renderSquare = (index) => (
     <button className="square" onClick={() => handleClick(index)}>
       {board[index]}
@@ -114,8 +119,8 @@ const computerMove = () => {
 
   return (
     <div className="game">
-      <div className="w-full m-4 flex flex-col justify-center items-center" >
-      <h1 className="w-full text-center m-4">Tic Tac Toe</h1>
+      <div className="w-full m-4 flex flex-col justify-center items-center">
+        <h1 className="w-full text-center m-4">Tic Tac Toe</h1>
         <div className="board">
           {[...Array(3)].map((_, rowIndex) => (
             <div key={rowIndex} className="board-row">
